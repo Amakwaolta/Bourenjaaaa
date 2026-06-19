@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Stick Ranger Modded</title>
+<style>
+table, th, td {border: 0.01px solid black;}
+
+#save-panel {
+  margin: 6px auto;
+  display: block;
+  width: 512px;
+  background: #1a1a2e;
+  border: 2px solid #4a4a8a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: MS Gothic, monospace;
+  font-size: 10pt;
+  color: #e0e0ff;
+  box-sizing: border-box;
+}
+#save-panel .sp-title {
+  font-weight: bold;
+  color: #aaaaff;
+  margin-bottom: 6px;
+  font-size: 11pt;
+}
+#save-panel .sp-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+#save-panel .slot-label {
+  width: 52px;
+  color: #ccccff;
+  font-size: 9pt;
+  flex-shrink: 0;
+}
+#save-panel .slot-info {
+  flex: 1;
+  font-size: 8pt;
+  color: #888899;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#save-panel button {
+  padding: 2px 10px;
+  font-family: MS Gothic, monospace;
+  font-size: 9pt;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #5555aa;
+  flex-shrink: 0;
+}
+#save-panel .btn-save  { background: #2a2a6a; color: #aaaaff; }
+#save-panel .btn-save:hover  { background: #3a3a8a; }
+#save-panel .btn-load  { background: #2a4a2a; color: #aaffaa; }
+#save-panel .btn-load:hover  { background: #3a6a3a; }
+#save-panel .btn-del   { background: #4a1a1a; color: #ffaaaa; }
+#save-panel .btn-del:hover   { background: #6a2a2a; }
+#save-panel .btn-cheat { background: #4a2a6a; color: #ffaaff; border-color: #8855aa; padding: 3px 14px; font-size: 10pt; }
+#save-panel .btn-cheat:hover { background: #6a3a9a; }
+#save-panel .cheat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+#save-panel .cheat-desc {
+  font-size: 8pt;
+  color: #aa88cc;
+}
+#save-panel .sp-divider {
+  border: none;
+  border-top: 1px solid #3a3a6a;
+  margin: 5px 0;
+}
+#save-panel #sp-msg {
+  margin-top: 4px;
+  font-size: 9pt;
+  color: #ffff88;
+  min-height: 16px;
+}
+#legacy-save { display: none; }
+</style>
+</head>
+
+<body background="data/main_bg.png" style="font-family:MS Gothic; font-size:9pt;">
+
+<div id="legacy-save">
+<SCRIPT TYPE="text/javascript"><!--
+function hu_tag2(id,lg){
+  var w='',ck='1';
+  var v=[['','Save game',''],['','Get',''],['','Set',''],['','User registration is required.','']];
+  if(ck[3]!=''){
+    w+='<STRONG>'+v[0][lg]+'</STRONG> : ';
+    w+='<TEXTAREA ID="bun" rows="1" cols="34" ONCLICK="this.select();"></TEXTAREA> ';
+    w+='<INPUT TYPE="SUBMIT" VALUE="'+v[1][lg]+'" ONCLICK="save2(\''+id+'\','+lg+')" ONMOUSEDOWN="';
+      w+='document.getElementById(\'bun\').value=\'\';document.getElementById(\'pass\').innerHTML=\'　\';';
+    w+='"> ';
+    w+='<INPUT TYPE="SUBMIT" VALUE="'+v[2][lg]+'" ONCLICK="load2(\''+id+'\','+lg+')" ONMOUSEDOWN="';
+      w+='document.getElementById(\'pass\').innerHTML=\'　\';';
+    w+='">';
+    w+='<DIV id="pass">　</DIV><BR>';
+  }else{
+    w+='<DIV><STRONG>'+v[0][lg]+'</STRONG> : '+v[3][lg]+'</DIV><BR>';
+  }
+  document.write(w);
+}
+hu_tag2('ranger',1);
+--></SCRIPT>
+</div>
+
+<div id="save-panel">
+  <div class="sp-title">💾 Save / Load</div>
+  <div class="sp-row">
+    <span class="slot-label">Slot 1</span>
+    <span class="slot-info" id="info0">--- empty ---</span>
+    <button class="btn-save" onclick="lsSave(0)">Save</button>
+    <button class="btn-load" onclick="lsLoad(0)">Load</button>
+    <button class="btn-del"  onclick="lsDel(0)">×</button>
+  </div>
+  <div class="sp-row">
+    <span class="slot-label">Slot 2</span>
+    <span class="slot-info" id="info1">--- empty ---</span>
+    <button class="btn-save" onclick="lsSave(1)">Save</button>
+    <button class="btn-load" onclick="lsLoad(1)">Load</button>
+    <button class="btn-del"  onclick="lsDel(1)">×</button>
+  </div>
+  <div class="sp-row">
+    <span class="slot-label">Slot 3</span>
+    <span class="slot-info" id="info2">--- empty ---</span>
+    <button class="btn-save" onclick="lsSave(2)">Save</button>
+    <button class="btn-load" onclick="lsLoad(2)">Load</button>
+    <button class="btn-del"  onclick="lsDel(2)">×</button>
+  </div>
+  <hr class="sp-divider">
+  <div class="cheat-row">
+    <button class="btn-cheat" onclick="loadMaxData()">⚡ 最強データをロード</button>
+    <span class="cheat-desc">Lv150 MAX / Gunner・Hammerer・Wizard・Gunner / HP+AT全振り</span>
+  </div>
+  <div id="sp-msg"></div>
+</div>
+
+<p align="center" style="margin: auto; display: block; width:512px;">Please support ha55ii, the original creator of SR, by playing his games on <a href="http://dan-ball.jp">dan-ball.jp</a>, including the original SR and other web games. </p>
+
+<br />
+
+<canvas id="cv" width="512" height="384" style="margin: auto; display: block; width: 512px;"></canvas>
+<script src="Stick Ranger Modded.js"></script>
+<SCRIPT TYPE="text/javascript"><!--
+Init("1",1,0);
+--></SCRIPT>
+
+<SCRIPT type="text/javascript"><!--
+
+/* ===== 旧セーブ関数（互換用） ===== */
+function save2(){
+  var s=GameSave("0"),h="";
+  if(s!=''){document.getElementById("bun").value=s;h='Get OK';}else{h='Error';}
+  document.getElementById("pass").innerHTML=h;
+}
+function load2(){
+  document.getElementById("bun").value=document.getElementById("bun").value.replace(/\x0D\x0A|\x0D|\x0A/g,'');
+  var s=document.getElementById("bun").value,ret=-1,h="";
+  if(s!='') ret=GameLoad(s);
+  if(ret!=-1) h='Set OK'; else h='Error';
+  document.getElementById("pass").innerHTML=h;
+}
+
+/* ===== localStorageセーブ機能 ===== */
+var LS_KEY = 'srModded71_save_';
+
+function spMsg(msg, isErr){
+  var el=document.getElementById('sp-msg');
+  el.textContent=msg;
+  el.style.color=isErr?'#ff6666':'#88ff88';
+  clearTimeout(spMsg._t);
+  spMsg._t=setTimeout(function(){el.textContent='';},3000);
+}
+
+function nowStr(){
+  var d=new Date();
+  return d.getFullYear()+'/'
+    +('0'+(d.getMonth()+1)).slice(-2)+'/'
+    +('0'+d.getDate()).slice(-2)+' '
+    +('0'+d.getHours()).slice(-2)+':'
+    +('0'+d.getMinutes()).slice(-2);
+}
+
+function updateSlotInfo(n){
+  var el=document.getElementById('info'+n);
+  try{
+    var raw=localStorage.getItem(LS_KEY+n);
+    if(!raw){el.textContent='--- empty ---';return;}
+    var obj=JSON.parse(raw);
+    el.textContent='['+( obj.date||'?')+']  '+(obj.note||'');
+  }catch(e){el.textContent='(corrupt)';}
+}
+
+function lsSave(n){
+  var data=GameSave("0");
+  if(!data||data===''){
+    spMsg('⚠ ゲームを開始してからSaveしてください',true);
+    return;
+  }
+  var obj={date:nowStr(),data:data,note:data.substring(0,12)+'...'};
+  try{
+    localStorage.setItem(LS_KEY+n,JSON.stringify(obj));
+    updateSlotInfo(n);
+    spMsg('Slot '+(n+1)+' にセーブしました ✓');
+  }catch(e){spMsg('セーブ失敗: '+e.message,true);}
+}
+
+function lsLoad(n){
+  try{
+    var raw=localStorage.getItem(LS_KEY+n);
+    if(!raw){spMsg('Slot '+(n+1)+' にデータがありません',true);return;}
+    var obj=JSON.parse(raw);
+    if(!obj.data){spMsg('データが壊れています',true);return;}
+    // GameLoad(data)を呼ぶだけでOK
+    // 次フレームのnf()→he("")が自動でロードしてくれる
+    // Init()の再呼び出しは不要（Neフラグが壊れてゲームが止まる原因だった）
+    var ret=GameLoad(obj.data);
+    if(ret===-1){spMsg('GameLoad拒否 (ret=-1)',true);return;}
+    spMsg('Slot '+(n+1)+' からロードしました ✓ （次フレームで反映）');
+  }catch(e){spMsg('ロード失敗: '+e.message,true);}
+}
+
+function lsDel(n){
+  if(!confirm('Slot '+(n+1)+' のデータを削除しますか？'))return;
+  localStorage.removeItem(LS_KEY+n);
+  updateSlotInfo(n);
+  spMsg('Slot '+(n+1)+' を削除しました');
+}
+
+/* ===== 最強データロード ===== */
+var MAX_DATA = '1L00OoCd3W.TztOztWoTnUqZxE5DyoXofTPRWVPTnkrCCMmp0TdQcRbmy9RMgdvCWrFIkpDe4X3Eo*X4eD0LzcGxqucL5su5vkaRW71yurpoopruy17EMVfq0DRgwBTm4Pl6UtHi8b3Y2Z5eCnN.cFvaGzhQAxjWK9*skdXSOLJIIJLOSXdks*9KWjxAQhzGavFc.NnCe5Z2Y3b8iHtU6lP4mTBwgRD0qfVME71yurpoopruy17EMVfq0DRgwBTm5RoAYxLmDhAf9gCoNyHuFuHyKamd';
+
+function loadMaxData(){
+  if(!confirm('最強データをロードします。\n現在のデータは上書きされます。よろしいですか？'))return;
+  var ret=GameLoad(MAX_DATA);
+  if(ret===-1){
+    spMsg('ロード失敗 (ret=-1)',true);
+    return;
+  }
+  spMsg('⚡ 最強データをロードしました！（次フレームで反映）');
+}
+
+window.addEventListener('load',function(){
+  for(var i=0;i<3;i++) updateSlotInfo(i);
+});
+
+--></SCRIPT>
+
+</body>
+</html>
