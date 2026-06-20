@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Stick Ranger Modded</title>
+<style>
+table, th, td {border: 0.01px solid black;}
+
+#save-panel {
+  margin: 6px auto;
+  display: block;
+  width: 512px;
+  background: #1a1a2e;
+  border: 2px solid #4a4a8a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: MS Gothic, monospace;
+  font-size: 10pt;
+  color: #e0e0ff;
+  box-sizing: border-box;
+}
+#save-panel .sp-title {
+  font-weight: bold;
+  color: #aaaaff;
+  margin-bottom: 6px;
+  font-size: 11pt;
+}
+#save-panel .sp-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+#save-panel .slot-label {
+  width: 52px;
+  color: #ccccff;
+  font-size: 9pt;
+  flex-shrink: 0;
+}
+#save-panel .slot-info {
+  flex: 1;
+  font-size: 8pt;
+  color: #888899;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#save-panel button {
+  padding: 2px 10px;
+  font-family: MS Gothic, monospace;
+  font-size: 9pt;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #5555aa;
+  flex-shrink: 0;
+}
+#save-panel .btn-save  { background: #2a2a6a; color: #aaaaff; }
+#save-panel .btn-save:hover  { background: #3a3a8a; }
+#save-panel .btn-load  { background: #2a4a2a; color: #aaffaa; }
+#save-panel .btn-load:hover  { background: #3a6a3a; }
+#save-panel .btn-del   { background: #4a1a1a; color: #ffaaaa; }
+#save-panel .btn-del:hover   { background: #6a2a2a; }
+#save-panel .btn-cheat { background: #4a2a6a; color: #ffaaff; border-color: #8855aa; padding: 3px 10px; font-size: 9pt; }
+#save-panel .btn-cheat:hover { background: #6a3a9a; }
+#save-panel .test-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+#save-panel .test-btn-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+#save-panel .cheat-desc {
+  font-size: 8pt;
+  color: #aa88cc;
+}
+#save-panel .sp-divider {
+  border: none;
+  border-top: 1px solid #3a3a6a;
+  margin: 5px 0;
+}
+#save-panel #sp-msg {
+  margin-top: 4px;
+  font-size: 9pt;
+  color: #ffff88;
+  min-height: 32px;
+  white-space: pre-wrap;
+}
+#legacy-save { display: none; }
+
+/* ===== iPad/タッチ操作時のページスクロール抑止 ===== */
+html, body {
+  overscroll-behavior: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#cv {
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+/* セーブパネルのボタン操作自体は通常通り使えるようにする */
+#save-panel, #save-panel * {
+  touch-action: manipulation;
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+</style>
+</head>
+
+<body background="data/main_bg.png" style="font-family:MS Gothic; font-size:9pt;">
+
+<div id="legacy-save">
+<SCRIPT TYPE="text/javascript"><!--
+function hu_tag2(id,lg){
+  var w='',ck='1';
+  var v=[['','Save game',''],['','Get',''],['','Set',''],['','User registration is required.','']];
+  if(ck[3]!=''){
+    w+='<STRONG>'+v[0][lg]+'</STRONG> : ';
+    w+='<TEXTAREA ID="bun" rows="1" cols="34" ONCLICK="this.select();"></TEXTAREA> ';
+    w+='<INPUT TYPE="SUBMIT" VALUE="'+v[1][lg]+'" ONCLICK="save2(\''+id+'\','+lg+')" ONMOUSEDOWN="';
+      w+='document.getElementById(\'bun\').value=\'\';document.getElementById(\'pass\').innerHTML=\'　\';';
+    w+='"> ';
+    w+='<INPUT TYPE="SUBMIT" VALUE="'+v[2][lg]+'" ONCLICK="load2(\''+id+'\','+lg+')" ONMOUSEDOWN="';
+      w+='document.getElementById(\'pass\').innerHTML=\'　\';';
+    w+='">';
+    w+='<DIV id="pass">　</DIV><BR>';
+  }else{
+    w+='<DIV><STRONG>'+v[0][lg]+'</STRONG> : '+v[3][lg]+'</DIV><BR>';
+  }
+  document.write(w);
+}
+hu_tag2('ranger',1);
+--></SCRIPT>
+</div>
+
+<div id="save-panel">
+  <div class="sp-title">💾 Save / Load（直接保存方式）</div>
+  <div class="sp-row">
+    <span class="slot-label">Slot 1</span>
+    <span class="slot-info" id="info0">--- empty ---</span>
+    <button class="btn-save" onclick="rawSave(0)">Save</button>
+    <button class="btn-load" onclick="rawLoad(0)">Load</button>
+    <button class="btn-del"  onclick="rawDel(0)">×</button>
+  </div>
+  <div class="sp-row">
+    <span class="slot-label">Slot 2</span>
+    <span class="slot-info" id="info1">--- empty ---</span>
+    <button class="btn-save" onclick="rawSave(1)">Save</button>
+    <button class="btn-load" onclick="rawLoad(1)">Load</button>
+    <button class="btn-del"  onclick="rawDel(1)">×</button>
+  </div>
+  <div class="sp-row">
+    <span class="slot-label">Slot 3</span>
+    <span class="slot-info" id="info2">--- empty ---</span>
+    <button class="btn-save" onclick="rawSave(2)">Save</button>
+    <button class="btn-load" onclick="rawLoad(2)">Load</button>
+    <button class="btn-del"  onclick="rawDel(2)">×</button>
+  </div>
+  <hr class="sp-divider">
+  <div class="test-row">
+    <div class="test-btn-row">
+      <button class="btn-cheat" onclick="loadMaxData()">⚡ 最強データをロード</button>
+    </div>
+    <span class="cheat-desc">Lv150 MAX（SPは未振り） / Gunner・Hammerer・Wizard・Gunner / 最強武器装備</span>
+  </div>
+  <hr class="sp-divider">
+  <div class="sp-title" style="font-size:10pt;">📜 復活の呪文を入力してロード</div>
+  <div class="sp-row">
+    <textarea id="spellInput" rows="2" placeholder="呪文生成器で作った文字列をここに貼り付け"
+      style="flex:1; background:#0d1326; color:#eef2ff; border:1px solid #5555aa; border-radius:4px;
+             font-family:MS Gothic, monospace; font-size:9pt; padding:4px; resize:vertical;"></textarea>
+  </div>
+  <div class="sp-row">
+    <button class="btn-cheat" onclick="loadSpellInput()">この呪文をロード</button>
+  </div>
+  <div id="sp-msg"></div>
+</div>
+
+<p align="center" style="margin: auto; display: block; width:512px;">Please support ha55ii, the original creator of SR, by playing his games on <a href="http://dan-ball.jp">dan-ball.jp</a>, including the original SR and other web games. </p>
+
+<br />
+
+<canvas id="cv" width="512" height="384" style="margin: auto; display: block; width: 512px;"></canvas>
+<script src="Stick Ranger Modded.js"></script>
+<SCRIPT TYPE="text/javascript"><!--
+Init("1",1,0);
+--></SCRIPT>
+
+<SCRIPT type="text/javascript"><!--
+
+/* ===== 旧セーブ関数（互換用） ===== */
+function save2(){
+  var s=GameSave("0"),h="";
+  if(s!=''){document.getElementById("bun").value=s;h='Get OK';}else{h='Error';}
+  document.getElementById("pass").innerHTML=h;
+}
+function load2(){
+  document.getElementById("bun").value=document.getElementById("bun").value.replace(/\x0D\x0A|\x0D|\x0A/g,'');
+  var s=document.getElementById("bun").value,ret=-1,h="";
+  if(s!='') ret=GameLoad(s);
+  if(ret!=-1) h='Set OK'; else h='Error';
+  document.getElementById("pass").innerHTML=h;
+}
+
+/* ===========================================================
+   直接保存方式
+=========================================================== */
+var RAW_KEY = 'srModded71_rawsave_';
+var FIELD_ARRAYS = ['Kb','Nb','cc','q','ec','fc','gc','hc','rc','Ja'];
+// 注意: 'l' は「現在のステージ番号」を表す変数であり、所持金ではない！
+// l を不用意に書き換えるとステージ判定が壊れフリーズするため、保存/復元の対象から除外する。
+// 本当の所持金（ゴールド）は Qb。
+var FIELD_SCALARS = ['Ob','Qb','sc','tc','uc','wc','DDB','FPSSW','MISTSW'];
+
+function spMsg(msg, isErr){
+  var el=document.getElementById('sp-msg');
+  el.textContent=msg;
+  el.style.color=isErr?'#ff6666':'#88ff88';
+}
+
+function nowStr(){
+  var d=new Date();
+  return d.getFullYear()+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+('0'+d.getDate()).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+}
+
+function updateSlotInfo(n){
+  var el=document.getElementById('info'+n);
+  try{
+    var raw=localStorage.getItem(RAW_KEY+n);
+    if(!raw){el.textContent='--- empty ---';return;}
+    var obj=JSON.parse(raw);
+    el.textContent='['+(obj.date||'?')+']  Lv'+(obj.data && obj.data.Kb ? obj.data.Kb[0] : '?');
+  }catch(e){el.textContent='(corrupt)';}
+}
+
+function captureGameState(){
+  var data = {};
+  FIELD_ARRAYS.forEach(function(name){
+    var arr = window[name];
+    if (arr) data[name] = Array.prototype.slice.call(arr, 0, 8);
+  });
+  FIELD_SCALARS.forEach(function(name){ data[name] = window[name]; });
+  var start = t, end = Ec;
+  var s_=[],ac_=[],bc_=[];
+  for (var i=start;i<end;i++){ s_.push(s[i]); ac_.push(Ac[i]); bc_.push(Bc[i]); }
+  data.weaponRangeStart = start;
+  data.s=s_; data.Ac=ac_; data.Bc=bc_;
+  data.ve = Array.prototype.slice.call(ve, 0, ue);
+  return data;
+}
+
+function applyGameState(data){
+  FIELD_ARRAYS.forEach(function(name){
+    if (!(name in data)) return;
+    var src=data[name], dst=window[name];
+    if (!dst) return;
+    for (var i=0;i<src.length;i++) dst[i]=src[i];
+  });
+  FIELD_SCALARS.forEach(function(name){ if (name in data) window[name]=data[name]; });
+  if (data.s && data.weaponRangeStart!==undefined){
+    var start=data.weaponRangeStart;
+    for (var i=0;i<data.s.length;i++){ s[start+i]=data.s[i]; Ac[start+i]=data.Ac[i]; Bc[start+i]=data.Bc[i]; }
+  }
+  if (data.ve){ for (var i=0;i<data.ve.length;i++) ve[i]=data.ve[i]; }
+}
+
+function rawSave(n){
+  try{
+    var data = captureGameState();
+    localStorage.setItem(RAW_KEY+n, JSON.stringify({date:nowStr(),data:data}));
+    updateSlotInfo(n);
+    spMsg('Slot '+(n+1)+' にセーブしました ✓');
+  }catch(e){ spMsg('セーブ失敗: '+e.message, true); }
+}
+
+function rawLoad(n){
+  try{
+    var raw = localStorage.getItem(RAW_KEY+n);
+    if (!raw){ spMsg('Slot '+(n+1)+' にデータがありません', true); return; }
+    applyGameState(JSON.parse(raw).data);
+    spMsg('Slot '+(n+1)+' をロードしました ✓');
+  }catch(e){ spMsg('ロード失敗: '+e.message, true); }
+}
+
+function rawDel(n){
+  if (!confirm('Slot '+(n+1)+' を削除しますか？')) return;
+  localStorage.removeItem(RAW_KEY+n);
+  updateSlotInfo(n);
+  spMsg('Slot '+(n+1)+' を削除しました');
+}
+
+/* ===========================================================
+   最強データロード
+   - レベルはMAX(150)。ただしSPは「未振り」のままにする
+     （ec/fc/gc/hc = 振り分け済みポイント は全部0、Nb = 未振りSPプールを最大化）
+   - 'l'（現在のステージ番号）には触れない
+   - 所持金は 'Qb'（'l'ではない）
+=========================================================== */
+function loadMaxData(){
+  if (!confirm('最強データをロードします。\n現在のデータは上書きされます。よろしいですか？')) return;
+  try{
+    Kb[0] = 150;                         // レベルMAX
+    cc[0]=6; cc[1]=11; cc[2]=13; cc[3]=6; // Gunner, Hammerer, Wizard, Gunner
+    s[t+0]=878; s[t+1]=855; s[t+2]=1050; s[t+3]=878; // 最強武器
+
+    // SPは振らない：振り分け済み(ec/fc/gc/hc)は0のまま、未振りSP(Nb)だけ最大化
+    ec[0]=0; ec[1]=0; ec[2]=0; ec[3]=0;
+    fc[0]=0; fc[1]=0; fc[2]=0; fc[3]=0;
+    gc[0]=0; gc[1]=0; gc[2]=0; gc[3]=0;
+    hc[0]=0; hc[1]=0; hc[2]=0; hc[3]=0;
+    Nb[0]=300; Nb[1]=300; Nb[2]=300; Nb[3]=300; // 未振りSPを最大に
+
+    Qb = 9999999; // ゴールド（'l'ではない）
+    Ob = 9999999; // EXP
+
+    spMsg('⚡ 最強データをロードしました！（SPは未振りのままです）');
+  }catch(e){
+    spMsg('最強データのロード失敗: ' + e.message, true);
+  }
+}
+
+/* ===========================================================
+   呪文生成器で作った「復活の呪文」を直接ロードする。
+   GameLoad()はゲーム本体側の標準デコード処理（he()）を呼ぶだけで、
+   実際の反映は次フレームのnf()内で行われる。
+   Ie()（チート検出）は既に無効化済みなので、その後の検証で
+   F=nullになりフリーズすることはない。
+=========================================================== */
+function loadSpellInput(){
+  var raw = document.getElementById('spellInput').value;
+  // 改行・空白を除去（コピペ時に紛れ込むことがあるため）
+  var spell = raw.replace(/[\r\n\s]/g, '');
+  if (!spell){
+    spMsg('呪文が入力されていません', true);
+    return;
+  }
+  if (!confirm('入力した呪文をロードします。\n現在のデータは上書きされます。よろしいですか？')) return;
+  try{
+    var ret = GameLoad(spell);
+    if (ret === -1){
+      spMsg('呪文のロードに失敗しました（不正な形式です）', true);
+      return;
+    }
+    spMsg('📜 呪文をロードしました ✓（次フレームで反映されます）');
+  }catch(e){
+    spMsg('ロード失敗: ' + e.message, true);
+  }
+}
+
+window.addEventListener('load', function(){
+  for (var i=0;i<3;i++) updateSlotInfo(i);
+});
+
+/* フレーム内エラーを画面に表示する仕組み */
+window.__onFrameError = function(errText){
+  var el = document.getElementById('sp-msg');
+  el.style.color = '#ff4444';
+  el.textContent = '🛑 ゲームループ内エラーを検出:\n' + errText;
+};
+
+/* ===========================================================
+   iPad対策：ゲーム操作によるページ全体のスクロール/バウンスを抑止。
+   ゲーム本体がdocument全体にtouchstart/touchmoveを登録しているが、
+   CSSのtouch-actionだけでは古いSafariで効かない場合があるため、
+   capture段階でpreventDefaultするリスナーを追加で挟む。
+   ただしセーブパネル(#save-panel)上の操作は素通りさせる。
+=========================================================== */
+document.addEventListener('touchmove', function(e){
+  if (e.target.closest && e.target.closest('#save-panel')) return; // パネル操作は許可
+  e.preventDefault();
+}, { passive: false, capture: true });
+
+document.addEventListener('gesturestart', function(e){
+  e.preventDefault();
+}, { passive: false });
+
+--></SCRIPT>
+
+</body>
+</html>
